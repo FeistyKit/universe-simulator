@@ -1,10 +1,12 @@
+use sfml::graphics::Color;
+
 #[derive(Debug, StructOfArray)]
 #[soa_derive = "Debug"]
 pub struct Spacebody {
     pub x: f32,
     pub y: f32,
     pub mass: f32,
-    pub colour: (u8, u8, u8),
+    pub colour: Color,
     pub ax: f32,
     pub ay: f32,
     pub xv: f32,   //x velocity
@@ -18,7 +20,7 @@ impl Spacebody {
         x: f32,
         y: f32,
         mass: f32,
-        colour: Option<(u8, u8, u8)>,
+        colour: Option<Color>,
         ax: f32,
         ay: f32,
         xv: f32,
@@ -29,7 +31,7 @@ impl Spacebody {
             x,
             y,
             mass,
-            colour: colour.unwrap_or((255, 255, 255)),
+            colour: colour.unwrap_or_else(|| Color::rgb(255, 255, 255)),
             ax,
             ay,
             xv,
