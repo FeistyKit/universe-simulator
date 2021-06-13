@@ -7,9 +7,9 @@ pub struct Spacebody {
     pub colour: (u8, u8, u8),
     pub ax: f32,
     pub ay: f32,
-    pub xv: f32,
-    pub yv: f32,
-    pub id: usize,
+    pub xv: f32,   //x velocity
+    pub yv: f32,   //y velocity
+    pub id: usize, //thinking of using an "id" system to verify bodies more effectively between the threads
 }
 
 impl Spacebody {

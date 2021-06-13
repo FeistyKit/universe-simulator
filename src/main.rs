@@ -3,7 +3,8 @@ mod eventhandling;
 mod simulation_thread;
 #[path = "./simulation/spacebody.rs"]
 mod spacebody;
-
+#[path = "./simulation/transmission.rs"]
+mod transmission;
 use sfml::window::{Style, Window};
 
 use crate::eventhandling::handle_events;
