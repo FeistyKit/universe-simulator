@@ -1,7 +1,7 @@
 #![allow(unused)]
 use sfml::{graphics::Color, system::Vector2f};
 #[derive(Debug)]
-enum SimulationEvent {
+pub enum SimulationEvent {
     //events that can be sent to the main thread for graphics processing
     Move {
         id: usize,
@@ -20,10 +20,10 @@ enum SimulationEvent {
     },
 }
 #[derive(Debug)]
-enum InputEvent {
+pub enum InputEvent {
     //Events from input to be sent to the simulation thread
     LeftClickOnSpace {
-        screenpos: Vector2f,
+        pos: Vector2f,
         highlighted_colour: Color,
         highlighted_size: f32,
         highlighted_mass: f32,
@@ -33,16 +33,11 @@ impl InputEvent {
     pub fn unwrap_lcos(self) -> (Vector2f, Color, f32, f32) {
         match self {
             InputEvent::LeftClickOnSpace {
-                screenpos,
+                pos,
                 highlighted_colour,
                 highlighted_size,
                 highlighted_mass,
-            } => (
-                screenpos,
-                highlighted_colour,
-                highlighted_size,
-                highlighted_mass,
-            ),
+            } => (pos, highlighted_colour, highlighted_size, highlighted_mass),
             _ => panic!("{:?} is not lcos!", self),
         }
     }
