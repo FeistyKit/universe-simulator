@@ -5,6 +5,8 @@ use sfml::system::Vector2f;
 
 use crate::{spacebody::*, transmission::SimulationEvent};
 
+use rayon::prelude::*;
+
 #[allow(unused)]
 pub struct WorldSpace {
     bodies: SpaceBodyVec,
@@ -41,5 +43,9 @@ impl WorldSpace {
             *xv += *ax * dt;
             *yv += *ay * dt;
         }
+    }
+    fn update_accelerations(&mut self, g: f32, softening: f32) {
+        let mut ax = 0;
+        let mut ay = 0;
     }
 }
