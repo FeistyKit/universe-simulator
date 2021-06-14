@@ -1,12 +1,12 @@
-use sfml::graphics::Color;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, StructOfArray)]
+#[derive(Debug, StructOfArray, Serialize, Deserialize)]
 #[soa_derive = "Debug"]
-pub struct Spacebody {
+pub struct SpaceBody {
     pub x: f32,
     pub y: f32,
     pub mass: f32,
-    pub colour: Color,
+    pub colour: (u8, u8, u8),
     pub ax: f32,
     pub ay: f32,
     pub xv: f32,   //x velocity
@@ -14,26 +14,25 @@ pub struct Spacebody {
     pub id: usize, //thinking of using an "id" system to verify bodies more effectively between the threads
 }
 
-impl Spacebody {
-    #[allow(clippy::clippy::too_many_arguments)]
+impl SpaceBody {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         x: f32,
         y: f32,
         mass: f32,
-        colour: Option<Color>,
-        ax: f32,
-        ay: f32,
+        colour: Option<(u8, u8, u8)>,
         xv: f32,
         yv: f32,
         id: usize,
-    ) -> Spacebody {
-        Spacebody {
+    ) -> SpaceBody {
+        //creating a new spacebody. these arguments will be habdles automatically.
+        SpaceBody {
             x,
             y,
             mass,
-            colour: colour.unwrap_or_else(|| Color::rgb(255, 255, 255)),
-            ax,
-            ay,
+            colour: colour.unwrap_or((255, 255, 255)),
+            ax: 0.0, //acceleration will be applied in the worldspace
+            ay: 0.0,
             xv,
             yv,
             id,

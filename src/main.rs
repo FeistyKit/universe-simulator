@@ -1,12 +1,13 @@
 mod eventhandling;
+#[path = "./gui/gui.rs"]
+mod gui;
 #[path = "./simulation/simulation_thread.rs"]
 mod simulation_thread;
 #[path = "./simulation/spacebody.rs"]
 mod spacebody;
-
-#[path = "./gui/gui.rs"]
-mod gui;
 mod transmission;
+#[path = "./simulation/worldspace.rs"]
+mod worldspace;
 use sfml::{graphics::RenderWindow, window::Style};
 
 use crate::eventhandling::EventHandler;
@@ -17,7 +18,7 @@ extern crate soa_derive;
 fn main() {
     let mut window = RenderWindow::new(
         (1000, 1000),
-        "tester window",
+        "Universe Sim",
         Style::CLOSE,
         &Default::default(),
     );
