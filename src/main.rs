@@ -4,8 +4,9 @@ mod simulation_thread;
 #[path = "./simulation/spacebody.rs"]
 mod spacebody;
 
+#[path = "./gui/gui.rs"]
+mod gui;
 mod transmission;
-
 use sfml::{graphics::RenderWindow, window::Style};
 
 use crate::eventhandling::EventHandler;

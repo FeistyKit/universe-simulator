@@ -24,21 +24,20 @@ impl EventHandler {
                     self.handle_left_button(x, y, window);
                 }
             }
-            _ => {
-                println!("{:?}", event)
-            }
+            _ => {}
         }
     }
     fn handle_left_button(&mut self, x: i32, y: i32, window: &RenderWindow) {
-        let pos = window.map_pixel_to_coords_current_view(Vector2::new(x, y));
-        self.trans_to_simulation
-            .send(InputEvent::LeftClickOnSpace {
+        let pos = window.map_pixel_to_coords_current_view(Vector2::new(x, y)); //get real coordinates from the input
+        self.trans_to_gui
+            .send(InputEvent::LeftClick {
+                screen_pos: Vector2::new(x, y),
                 pos,
                 highlighted_colour: Color::WHITE,
                 highlighted_size: 30.0,
                 highlighted_mass: 25.0,
             })
-            .unwrap();
+            .unwrap(); //send coordinates to gui thread for processing
     }
     pub fn prepare(window: &mut RenderWindow) -> EventHandler {
         //prepares to start the program and the other threads
