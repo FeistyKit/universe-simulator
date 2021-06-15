@@ -8,12 +8,14 @@ mod spacebody;
 mod transmission;
 #[path = "./simulation/worldspace.rs"]
 mod worldspace;
+use std::{
+    sync::mpsc::channel,
+    thread::{self, Thread},
+};
+
 use sfml::{graphics::RenderWindow, window::Style};
 
-use crate::eventhandling::EventHandler;
-
-#[macro_use]
-extern crate soa_derive;
+use crate::{eventhandling::EventHandler, simulation_thread::simulation_thread_start};
 
 fn main() {
     let mut window = RenderWindow::new(
@@ -23,7 +25,10 @@ fn main() {
         &Default::default(),
     );
     window.set_framerate_limit(45);
-    let mut handler = EventHandler::prepare(&mut window);
+    let (simulation_sender, _) = channel();
+    let (mut handler, simulation_receiver) = EventHandler::prepare(&mut window);
+    let simulation_thread =
+        thread::spawn(|| simulation_thread_start(simulation_sender, simulation_receiver));
     while window.is_open() {
         while let Some(event) = window.poll_event() {
             handler.handle_events(event, &mut window)
@@ -31,4 +36,5 @@ fn main() {
         window.set_active(true);
         window.display();
     }
+    simulation_thread.join().unwrap();
 }

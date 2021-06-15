@@ -8,7 +8,6 @@ edition = "2018"
 
 [dependencies]
 sfml = "0.15.1"
-soa_derive = "*"
 serde = { version = "1.0.126", features = ["derive"] }
 serde_json = "*"
 rayon = "*"

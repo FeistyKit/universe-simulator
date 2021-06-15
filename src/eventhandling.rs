@@ -1,4 +1,4 @@
-use std::sync::mpsc::{channel, Sender};
+use std::sync::mpsc::{channel, Receiver, Sender};
 
 use sfml::{
     graphics::{Color, RenderTarget, RenderWindow, View},
@@ -39,9 +39,9 @@ impl EventHandler {
             })
             .unwrap(); //send coordinates to gui thread for processing
     }
-    pub fn prepare(window: &mut RenderWindow) -> EventHandler {
+    pub fn prepare(window: &mut RenderWindow) -> (EventHandler, Receiver<InputEvent>) {
         //prepares to start the program and the other threads
-        let (simul_tx, _) = channel();
+        let (simul_tx, simul_receiver) = channel();
         let (gui_tx, _) = channel();
         let handler = EventHandler {
             trans_to_simulation: simul_tx,
@@ -54,6 +54,6 @@ impl EventHandler {
             Vector2f::new(size.x as f32, size.y as f32),
         );
         window.set_view(&view);
-        handler
+        (handler, simul_receiver)
     }
 }

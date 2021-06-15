@@ -32,6 +32,7 @@ pub enum InputEvent {
         highlighted_size: f32,
         highlighted_mass: f32,
     },
+    ShutDown,
 }
 impl InputEvent {
     pub fn unwrap_lcos(self) -> (Vector2<i32>, Vector2f, Color, f32, f32) {
