@@ -15,17 +15,46 @@ pub fn simulation_thread_start(
     receiver: Receiver<InputEvent>,
 ) {
     let mut space = WorldSpace::new();
+    /*
     let body_one = SpaceBody::new(100.0, 100.0, 30.0, None, -10.0, 0.0, None);
     let body_two = SpaceBody::new(600.0, 600.0, 30.0, None, 10.0, 0.0, None);
     space.add_body(body_one, &mut sender);
     space.add_body(body_two, &mut sender);
-    loop {
+    */
+    'simulation: loop {
         while let Ok(event) = receiver.try_recv() {
-            if let InputEvent::ShutDown = event {
-                return;
+            match event {
+                InputEvent::LeftClick {
+                    screen_pos: _,
+                    pos,
+                    highlighted_colour,
+                    highlighted_size,
+                    highlighted_mass,
+                } => {
+                    //TODO remove this this is just testing
+                    if !cfg!(debug_assertions) {
+                        panic!("gui threading!");
+                    }
+                    let body = SpaceBody::new(
+                        pos.x,
+                        pos.y,
+                        highlighted_mass,
+                        highlighted_size,
+                        Some((
+                            highlighted_colour.r,
+                            highlighted_colour.g,
+                            highlighted_colour.b,
+                        )),
+                        0.0,
+                        0.0,
+                        None,
+                    );
+                    space.add_body(body, &mut sender);
+                }
+                InputEvent::ShutDown => break 'simulation,
             }
         }
         space.update_advance(10.0, sender.clone());
         thread::sleep(Duration::new(0, TIME_STEP));
     }
-} //eventually going to be the main function for the simulation thread
+}

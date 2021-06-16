@@ -101,6 +101,7 @@ impl WorldSpace {
                 id: body.id.unwrap(),
                 pos: Vector2f::new(body.x, body.y),
                 color: body.colour,
+                size: body.radius,
             })
             .unwrap();
         self.bodies.push(body);

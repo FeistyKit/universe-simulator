@@ -17,6 +17,7 @@ impl EventHandler {
     pub fn handle_events(&mut self, event: Event, window: &mut RenderWindow) {
         match event {
             Event::Closed => {
+                self.trans_to_simulation.send(InputEvent::ShutDown).unwrap();
                 window.close();
             }
             Event::MouseButtonPressed { button, x, y } => {
@@ -29,6 +30,16 @@ impl EventHandler {
     }
     fn handle_left_button(&mut self, x: i32, y: i32, window: &RenderWindow) {
         let pos = window.map_pixel_to_coords_current_view(Vector2::new(x, y)); //get real coordinates from the input
+        self.trans_to_simulation
+            .send(InputEvent::LeftClick {
+                screen_pos: Vector2::new(x, y),
+                pos,
+                highlighted_colour: Color::WHITE,
+                highlighted_size: 30.0,
+                highlighted_mass: 25.0,
+            })
+            .unwrap();
+        /*
         self.trans_to_gui
             .send(InputEvent::LeftClick {
                 screen_pos: Vector2::new(x, y),
@@ -38,6 +49,8 @@ impl EventHandler {
                 highlighted_mass: 25.0,
             })
             .unwrap(); //send coordinates to gui thread for processing
+            */
+        //TODO Put in gui things so that this does not go straight to the simulation
     }
     pub fn prepare(window: &mut RenderWindow) -> (EventHandler, Receiver<InputEvent>) {
         //prepares to start the program and the other threads

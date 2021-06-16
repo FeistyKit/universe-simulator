@@ -5,6 +5,7 @@ pub struct SpaceBody {
     pub x: f32,
     pub y: f32,
     pub mass: f32,
+    pub radius: f32,
     pub colour: (u8, u8, u8),
     pub ax: f32,
     pub ay: f32,
@@ -19,6 +20,7 @@ impl SpaceBody {
         x: f32,
         y: f32,
         mass: f32,
+        radius: f32,
         colour: Option<(u8, u8, u8)>,
         xv: f32,
         yv: f32,
@@ -29,6 +31,7 @@ impl SpaceBody {
             x,
             y,
             mass,
+            radius,
             colour: colour.unwrap_or((255, 255, 255)),
             ax: 0.0, //acceleration will be applied in the worldspace
             ay: 0.0,

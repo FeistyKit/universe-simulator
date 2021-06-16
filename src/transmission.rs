@@ -20,6 +20,7 @@ pub enum SimulationEvent {
         id: usize,
         pos: Vector2f,
         color: (u8, u8, u8),
+        size: f32,
     },
 }
 #[derive(Debug)]
