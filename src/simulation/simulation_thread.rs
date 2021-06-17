@@ -1,7 +1,7 @@
 use std::{
     sync::mpsc::{Receiver, Sender},
     thread,
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 use crate::{
@@ -19,6 +19,7 @@ pub fn simulation_thread_start(
     let body_two = SpaceBody::new(600.0, 600.0, 30.0, 30.0, None, 1.0, 0.0, None);
     space.add_body(body_one, &mut sender);
     space.add_body(body_two, &mut sender);
+    let mut time = Instant::now();
     'simulation: loop {
         if !cfg!(debug_assertions) {
             panic!("gui threading!");
@@ -56,7 +57,17 @@ pub fn simulation_thread_start(
                 }
             }
         }
-        space.update_advance(10.0, sender.clone());
-        thread::sleep(Duration::new(0, TIME_STEP));
+        let elapsed = time.elapsed();
+        space.update_advance(
+            to_simulation_time(elapsed + Duration::new(0, TIME_STEP)),
+            sender.clone(),
+        );
+        thread::sleep(Duration::new(0, TIME_STEP) - elapsed);
+        time = Instant::now();
     }
+}
+#[allow(unused)]
+fn to_simulation_time(time_passed: Duration) -> f32 {
+    let nanos = time_passed.subsec_nanos();
+    (nanos / TIME_STEP) as f32 * 10.0
 }

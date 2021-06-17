@@ -45,7 +45,7 @@ fn main() {
         }
         window.clear(Color::BLACK);
         window.set_active(true);
-        graphics_handler.update(10.0);
+        graphics_handler.update();
         graphics_handler.draw(&mut window);
         window.display();
     }

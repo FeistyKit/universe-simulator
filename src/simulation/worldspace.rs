@@ -40,7 +40,7 @@ impl WorldSpace {
                     id: body.id.unwrap(),
                     idx: tuple.0,
                     pos: Vector2f::new(body.x, body.y),
-                    change: Vector2f::new(body.xv, body.yv),
+                    change: Vector2f::new(body.xv * dt, body.yv * dt),
                 })
                 .unwrap();
                 body.x += body.xv * dt;

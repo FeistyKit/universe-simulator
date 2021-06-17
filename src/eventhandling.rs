@@ -86,12 +86,12 @@ impl EventHandler {
         match details.0 {
             Key::Up => {
                 let mut view = window.view().to_owned();
-                view.zoom(1.25);
+                view.zoom(0.75); //zoom in
                 window.set_view(&view);
             }
             Key::Down => {
                 let mut view = window.view().to_owned();
-                view.zoom(0.75);
+                view.zoom(1.25); //zoom out
                 window.set_view(&view);
             }
             Key::C => {
