@@ -46,6 +46,7 @@ impl<'bodies> GraphicHandler<'bodies> {
                     let body = GraphicBody { id, shape: circle };
                     self.bodies.push(body);
                 }
+                SimulationEvent::Clear => self.bodies = Vec::new(),
             }
         }
     }

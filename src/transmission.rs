@@ -22,6 +22,7 @@ pub enum SimulationEvent {
         color: (u8, u8, u8),
         size: f32,
     },
+    Clear,
 }
 #[derive(Debug)]
 pub enum InputEvent {
@@ -34,6 +35,7 @@ pub enum InputEvent {
         highlighted_mass: f32,
     },
     ShutDown,
+    Clear,
 }
 impl InputEvent {
     pub fn unwrap_lcos(self) -> (Vector2<i32>, Vector2f, Color, f32, f32) {

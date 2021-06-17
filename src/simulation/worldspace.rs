@@ -53,6 +53,10 @@ impl WorldSpace {
             body.yv += body.ay * dt;
         });
     }
+    pub fn clear(&mut self, sender: &mut Sender<SimulationEvent>) {
+        self.bodies = Vec::new();
+        sender.send(SimulationEvent::Clear).unwrap();
+    }
     fn update_accelerations(&mut self) {
         let g = self.g;
         let softening = self.softening;

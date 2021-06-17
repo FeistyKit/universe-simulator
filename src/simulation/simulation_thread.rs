@@ -50,6 +50,10 @@ pub fn simulation_thread_start(
                     space.add_body(body, &mut sender);
                 }
                 InputEvent::ShutDown => break 'simulation,
+                InputEvent::Clear => {
+                    println!("clearing space!");
+                    space.clear(&mut sender);
+                }
             }
         }
         space.update_advance(10.0, sender.clone());

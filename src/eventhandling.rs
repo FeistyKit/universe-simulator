@@ -3,7 +3,7 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use sfml::{
     graphics::{Color, RenderTarget, RenderWindow, View},
     system::{Vector2, Vector2f},
-    window::{mouse::Button, Event},
+    window::{mouse::Button, Event, Key},
 };
 
 use crate::transmission::InputEvent;
@@ -24,6 +24,15 @@ impl EventHandler {
                 if button == Button::Left {
                     self.handle_left_button(x, y, window);
                 }
+            }
+            Event::KeyPressed {
+                code,
+                alt,
+                ctrl,
+                shift,
+                system,
+            } => {
+                self.handle_key_pressed(window, (code, alt, ctrl, shift, system));
             }
             _ => {}
         }
@@ -68,5 +77,27 @@ impl EventHandler {
         );
         window.set_view(&view);
         (handler, simul_receiver)
+    }
+    fn handle_key_pressed(
+        &mut self,
+        window: &mut RenderWindow,
+        details: (Key, bool, bool, bool, bool),
+    ) {
+        match details.0 {
+            Key::Up => {
+                let mut view = window.view().to_owned();
+                view.zoom(1.25);
+                window.set_view(&view);
+            }
+            Key::Down => {
+                let mut view = window.view().to_owned();
+                view.zoom(0.75);
+                window.set_view(&view);
+            }
+            Key::C => {
+                self.trans_to_simulation.send(InputEvent::Clear).unwrap();
+            }
+            _ => {}
+        }
     }
 }
