@@ -15,13 +15,14 @@ pub fn simulation_thread_start(
     receiver: Receiver<InputEvent>,
 ) {
     let mut space = WorldSpace::new();
-    /*
-    let body_one = SpaceBody::new(100.0, 100.0, 30.0, None, -10.0, 0.0, None);
-    let body_two = SpaceBody::new(600.0, 600.0, 30.0, None, 10.0, 0.0, None);
+    let body_one = SpaceBody::new(100.0, 100.0, 30.0, 30.0, None, -1.0, 0.0, None);
+    let body_two = SpaceBody::new(600.0, 600.0, 30.0, 30.0, None, 1.0, 0.0, None);
     space.add_body(body_one, &mut sender);
     space.add_body(body_two, &mut sender);
-    */
     'simulation: loop {
+        if !cfg!(debug_assertions) {
+            panic!("gui threading!");
+        }
         while let Ok(event) = receiver.try_recv() {
             match event {
                 InputEvent::LeftClick {
@@ -32,9 +33,6 @@ pub fn simulation_thread_start(
                     highlighted_mass,
                 } => {
                     //TODO remove this this is just testing
-                    if !cfg!(debug_assertions) {
-                        panic!("gui threading!");
-                    }
                     let body = SpaceBody::new(
                         pos.x,
                         pos.y,

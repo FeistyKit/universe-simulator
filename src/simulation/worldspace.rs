@@ -23,8 +23,8 @@ impl WorldSpace {
             bodies: Vec::new(),
             highlighted_id: None,
             stopped: false,
-            g: 16.0,
-            softening: 1.0,
+            g: 50.0,
+            softening: 30.0,
             prepared_id: 0,
         }
     }
@@ -59,10 +59,14 @@ impl WorldSpace {
         for idx in 0..self.bodies.len() {
             let ax = Arc::new(Mutex::new(0.0));
             let ay = Arc::new(Mutex::new(0.0));
+            let id = self.bodies[idx].id;
             let body_x = self.bodies[idx].x;
             let body_y = self.bodies[idx].y; //these are so that it's not double-borrowed
             self.bodies.par_iter()
             .for_each(|other| {
+                if other.id == id { //so that it doesn't do gravity for itself, which causes extreme errors
+                    return;
+                }
                 let dx = body_x - other.x;
                 let dy = body_y - other.y;
                 let squared = dx * dx + dy * dy;
@@ -71,8 +75,8 @@ impl WorldSpace {
                 *ay.lock().unwrap() += dy * force;
             });
             let mut body = &mut self.bodies[idx];
-            body.ax = *ax.lock().unwrap();
-            body.ay = *ay.lock().unwrap();
+            body.ax = *ax.lock().unwrap() * -1.0; //for a reason I don't really understand the accelerations are the opposite of what they should be, so this is the fix
+            body.ay = *ay.lock().unwrap() * -1.0;
         }
     }
     #[allow(unused)]

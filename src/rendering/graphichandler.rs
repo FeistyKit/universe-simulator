@@ -15,7 +15,7 @@ impl<'bodies> GraphicHandler<'bodies> {
             receiver,
         }
     }
-    pub fn update(&mut self) {
+    pub fn update(&mut self, dt: f32) {
         //the function to update the graphics handler.
         while let Ok(input) = self.receiver.try_recv() {
             //dealing with every input
@@ -28,7 +28,7 @@ impl<'bodies> GraphicHandler<'bodies> {
                 } => {
                     assert_eq!(id, self.bodies[idx].id); //making sure we haven't desynced from the simulation thread
                     debug_assert_eq!(self.bodies[idx].shape.position(), pos);
-                    self.bodies[idx].shape.move_(change);
+                    self.bodies[idx].shape.move_(change * dt);
                 }
                 SimulationEvent::Delete { id, idx } => {
                     assert_eq!(self.bodies[idx].id, id);
