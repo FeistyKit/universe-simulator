@@ -10,14 +10,15 @@ use rayon::prelude::*;
 #[allow(unused)]
 pub struct WorldSpace {
     bodies: Vec<SpaceBody>,
-    highlighted_id: Option<usize>,
-    stopped: bool,
-    g: f32,
-    softening: f32,
-    prepared_id: usize, //this is how I will have it automatically assign an id to each body
+    highlighted_id: Option<usize>, //the id of the spacebody that is being "followed" by the camera
+    stopped: bool,                 //whether the simulation is paused or not
+    g: f32, //the force of gravity. I've got the default as 50.0 right now but some tweaking might be in order
+    softening: f32, //a constant to stop a bug where bodies pass over each other and move incredibly quickly. also needs some tweaking
+    prepared_id: usize, //this is how I will have it automatically assign an id to each body.
 }
+
 impl WorldSpace {
-    #[allow(unused)]
+    //creating a new worldspace from defaults. Eventually I'm going to be able to save and load worldspaces from a file
     pub fn new() -> WorldSpace {
         WorldSpace {
             bodies: Vec::new(),
@@ -28,44 +29,50 @@ impl WorldSpace {
             prepared_id: 0,
         }
     }
+
+    //updating positions of each body from it's velocity values
     fn update_positions(&mut self, sender: Sender<SimulationEvent>, dt: f32) {
-        //updating positions of each body
         self.bodies
             .par_iter_mut()
             .enumerate() //getting the index of each element
-            .for_each_with(sender, |sen, tuple| {
+            .for_each_with(sender, |sen, (idx, body)| {
                 //cloning the sender so that it can be sent to each thread to send to the graphical/main thread
-                let body = tuple.1;
                 sen.send(SimulationEvent::Move {
-                    id: body.id.unwrap(),
-                    idx: tuple.0,
+                    id: body.id.unwrap(), //the only time a body has no id is when it is first created.
+                    idx,
                     pos: Vector2f::new(body.x, body.y),
                     change: Vector2f::new(body.xv * dt, body.yv * dt),
                 })
                 .unwrap();
-                body.x += body.xv * dt;
+                body.x += body.xv * dt; //i'm not entirely sure how to proceed on the delta time in calculations front, but i'll figure it out eventually
                 body.y += body.yv * dt;
             });
     }
+
+    //updating the velocities of the bodies from their accelerations
     fn update_velocity(&mut self, dt: f32) {
         self.bodies.par_iter_mut().for_each(|body| {
             body.xv += body.ax * dt;
             body.yv += body.ay * dt;
         });
     }
+
+    //clearing the worldspace of bodies. I'm not sure whether I like handing in the sender, but i'll keep it for now
     pub fn clear(&mut self, sender: &mut Sender<SimulationEvent>) {
         self.bodies = Vec::new();
         sender.send(SimulationEvent::Clear).unwrap();
     }
+
+    //the most important function for the entire simulation. this calculates the gravitational pull on each body
     fn update_accelerations(&mut self) {
-        let g = self.g;
+        let g = self.g; //the force of gravity
         let softening = self.softening;
         for idx in 0..self.bodies.len() {
-            let ax = Arc::new(Mutex::new(0.0));
+            let ax = Arc::new(Mutex::new(0.0)); //thread safety woot woot
             let ay = Arc::new(Mutex::new(0.0));
             let id = self.bodies[idx].id;
             let body_x = self.bodies[idx].x;
-            let body_y = self.bodies[idx].y; //these are so that it's not double-borrowed
+            let body_y = self.bodies[idx].y; //these are so that it's not double-borrowed and the compiler will stop yelling at me D:
             self.bodies.par_iter()
             .for_each(|other| {
                 if other.id == id { //so that it doesn't do gravity for itself, which causes extreme errors
@@ -83,14 +90,21 @@ impl WorldSpace {
             body.ay = *ay.lock().unwrap() * -1.0;
         }
     }
+
+    //freezing the simulation
     #[allow(unused)]
     pub fn stop(&mut self) {
         self.stopped = true;
     }
+
+    //unfreezing the simulation :O
     #[allow(unused)]
     pub fn unstop(&mut self) {
         self.stopped = false;
     }
+
+    //wrapping all of the internal functions together so that only one method has to be called to update and advance
+    //hence the name
     pub fn update_advance(&mut self, dt: f32, sender: Sender<SimulationEvent>) {
         if !self.stopped {
             //so time can be "frozen"
@@ -99,11 +113,17 @@ impl WorldSpace {
             self.update_positions(sender, dt);
         }
     }
+
+    //adding a body to the simulation
     pub fn add_body(&mut self, mut body: SpaceBody, sender: &mut Sender<SimulationEvent>) {
+        //it should not have an id, because having an id pre-set is likely to cause problems
+        //this way we know that no body will have had this id, because the prepared id can only go up!
         if body.id.is_none() {
             body.id = Some(self.prepared_id);
             self.prepared_id += 1;
         }
+
+        //just sending the new body over to the graphics thread to be added in there
         sender
             .send(SimulationEvent::Add {
                 id: body.id.unwrap(),

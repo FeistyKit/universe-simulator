@@ -25,6 +25,7 @@ use crate::{
 };
 
 fn main() {
+    //prepare the window to be used and set the frame limit for it
     let mut window = RenderWindow::new(
         (1000, 1000),
         "Universe Sim",
@@ -32,20 +33,39 @@ fn main() {
         &Default::default(),
     );
     window.set_framerate_limit(45);
+
+    //create the sender and reciever for communication with the simulation thread
     let (simulation_sender, simulation_receiver) = channel();
+
+    //prepare the graphics handler to handle the graphics on the main thread.
+    //My goal is to have as few operations that are not directly graphics related as possible running on this thread
     let mut graphics_handler = GraphicHandler::new(simulation_receiver);
-    let (mut handler, simulation_receiver) = EventHandler::prepare(&mut window);
+
+    //preparing the event handler. it will take events from sfml and send whatever is needed to the graphics thread or GUI thread
+    let (mut handler, input_reciever) = EventHandler::prepare();
+
+    //Making the simulation thread
     let simulation_thread = thread::Builder::new()
         .name("Simulation".to_string())
-        .spawn(|| simulation_thread_start(simulation_sender, simulation_receiver))
-        .unwrap();
+        .spawn(|| simulation_thread_start(simulation_sender, input_reciever))
+        .unwrap(); //If making the simulation thread fails the whole program should end;
+                   //it is a necesary part of the program.
+
+    //the main loop of the graphics side of the program
     while window.is_open() {
+        //using up all of the events in between the previous cycles
         while let Some(event) = window.poll_event() {
+            //from here, the handler can take the event and do whatever is necesary with it
             handler.handle_events(event, &mut window);
         }
+
         window.clear(Color::BLACK);
         window.set_active(true);
+
+        //receive everything from the other threads and apply it to the current graphical model
         graphics_handler.update();
+
+        //render all of the changes to the window
         graphics_handler.draw(&mut window);
         window.display();
     }
