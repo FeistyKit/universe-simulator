@@ -1,6 +1,4 @@
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Serialize, Deserialize)] //idk why but for some reason this is killing rust analyzer
+#[derive(Debug)] //idk why but for some reason this is killing rust analyzer. I'm removing it for now for that sweet, sweet "no errors" message.
 pub struct SpaceBody {
     pub x: f32,
     pub y: f32,
