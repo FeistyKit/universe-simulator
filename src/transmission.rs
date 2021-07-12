@@ -51,3 +51,11 @@ pub enum InputEvent {
     //clearing the simulation and graphic vectors of bodies
     Clear,
 }
+
+//Events from the GUI thread to be sent to simulation thread
+#[derive(Debug)]
+pub enum GuiToSimEvent {}
+
+//An event to be sent from the gui thread to the graphics thread.
+#[derive(Debug)]
+pub enum GuiToGraphicsEvent {}

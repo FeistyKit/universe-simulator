@@ -27,7 +27,7 @@ pub fn simulation_thread_start(
     space.add_body(body_one, &mut sender);
     space.add_body(body_two, &mut sender);
 
-    //prepare for my terrible delta time function
+    //preparations for my terrible delta time function
     let mut time = Instant::now();
     'simulation: loop {
         //so I can't publish a release of the code without the GUI thread implemented
