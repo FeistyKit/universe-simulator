@@ -44,10 +44,13 @@ fn main() {
     //preparing the event handler. it will take events from sfml and send whatever is needed to the graphics thread or GUI thread
     let (mut handler, input_reciever) = EventHandler::prepare();
 
+    //preparing the channel between the GUI thread and the simulation thread
+    let (_, gui_to_sim_receiver) = channel();
+
     //Making the simulation thread
     let simulation_thread = thread::Builder::new()
         .name("Simulation".to_string())
-        .spawn(|| simulation_thread_start(simulation_sender, input_reciever))
+        .spawn(|| simulation_thread_start(simulation_sender, gui_to_sim_receiver))
         .unwrap(); //If making the simulation thread fails the whole program should end;
                    //it is a necesary part of the program.
 

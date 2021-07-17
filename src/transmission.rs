@@ -1,7 +1,4 @@
-use sfml::{
-    graphics::Color,
-    system::{Vector2, Vector2f},
-};
+use sfml::system::{Vector2, Vector2f};
 
 //events that can be sent to the main thread for graphics processing
 #[allow(unused)]
@@ -40,10 +37,7 @@ pub enum InputEvent {
     LeftClick {
         screen_pos: Vector2<i32>,
         pos: Vector2f,
-        highlighted_colour: Color, //this hasn't been implemented yet, but I hope to set up a system with the gui
-        highlighted_size: f32, //so that there is a little "example planet" in the gui that you can change different parts of:
-        highlighted_mass: f32, //mass, radius, colour, etc. When a new planet gets added, it will get added with those stats.
-    },
+    }, //I removed the highlighted size stuff because that will be handled on the GUI thread
 
     //sending events to the other threads so it can be cleaned up properly
     ShutDown,
@@ -54,7 +48,17 @@ pub enum InputEvent {
 
 //Events from the GUI thread to be sent to simulation thread
 #[derive(Debug)]
-pub enum GuiToSimEvent {}
+#[allow(unused)]
+pub enum GuiToSimEvent {
+    AddBody {
+        color: (u8, u8, u8),
+        size: f32,
+        mass: f32,
+        pos: Vector2<f32>,
+    },
+    Clear,
+    Exit,
+}
 
 //An event to be sent from the gui thread to the graphics thread.
 #[derive(Debug)]

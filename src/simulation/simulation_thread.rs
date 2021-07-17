@@ -6,7 +6,7 @@ use std::{
 
 use crate::{
     spacebody::SpaceBody,
-    transmission::{InputEvent, SimulationEvent},
+    transmission::{GuiToSimEvent, SimulationEvent},
     worldspace::WorldSpace,
 };
 
@@ -16,7 +16,7 @@ const TIME_STEP: u32 = 1_000_000_000 / 45;
 //start the simulation thread
 pub fn simulation_thread_start(
     mut sender: Sender<SimulationEvent>,
-    receiver: Receiver<InputEvent>,
+    receiver: Receiver<GuiToSimEvent>,
 ) {
     //prepare the worldspace by loading defaults
     let mut space = WorldSpace::new();
@@ -54,38 +54,32 @@ pub fn simulation_thread_start(
 }
 
 fn handle_received_events(
-    event: InputEvent,
+    event: GuiToSimEvent,
     space: &mut WorldSpace,
     sender: &mut Sender<SimulationEvent>,
 ) -> bool {
     match event {
-        InputEvent::LeftClick {
-            screen_pos: _,
+        GuiToSimEvent::AddBody {
+            color,
+            size,
+            mass,
             pos,
-            highlighted_colour,
-            highlighted_size,
-            highlighted_mass,
         } => {
-            //I will eventually remove this when I implement the GUI thread. It's a stopgap measure.
-            //Just adding a new body directly, instead of how it is supposed to be
+            //adding the body to the worldspace. the "add_body" method will handle sending it to the main thread
             let body = SpaceBody::new(
                 pos.x,
                 pos.y,
-                highlighted_mass,
-                highlighted_size,
-                Some((
-                    highlighted_colour.r,
-                    highlighted_colour.g,
-                    highlighted_colour.b,
-                )),
+                mass,
+                size,
+                Some((color.0, color.1, color.2)),
                 0.0,
                 0.0,
                 None,
             );
             space.add_body(body, sender);
         }
-        InputEvent::ShutDown => return true,
-        InputEvent::Clear => {
+        GuiToSimEvent::Exit => return true,
+        GuiToSimEvent::Clear => {
             println!("clearing space!");
             space.clear(sender);
         }

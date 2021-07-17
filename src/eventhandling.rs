@@ -1,7 +1,7 @@
 use std::sync::mpsc::{channel, Receiver, Sender};
 
 use sfml::{
-    graphics::{Color, RenderTarget, RenderWindow},
+    graphics::{RenderTarget, RenderWindow},
     system::Vector2,
     window::{mouse::Button, Event, Key},
 };
@@ -47,29 +47,13 @@ impl EventHandler {
     fn handle_left_button(&mut self, x: i32, y: i32, window: &RenderWindow) {
         let pos = window.map_pixel_to_coords_current_view(Vector2::new(x, y)); //get real coordinates from the input
 
-        //send the information to the simulation thread
-        self.trans_to_simulation
-            .send(InputEvent::LeftClick {
-                screen_pos: Vector2::new(x, y),
-                pos,
-                highlighted_colour: Color::WHITE, //using these defaults until I get the GUI thread up and running
-                highlighted_size: 30.0,
-                highlighted_mass: 25.0,
-            })
-            .unwrap();
-
-        /*
         self.trans_to_gui
             .send(InputEvent::LeftClick {
                 screen_pos: Vector2::new(x, y),
                 pos,
-                highlighted_colour: Color::WHITE,
-                highlighted_size: 30.0,
-                highlighted_mass: 25.0,
             })
             .unwrap(); //send coordinates to gui thread for processing
-            */
-        //TODO Put in gui things so that this does not go straight to the simulation
+                       //TODO Put in gui things so that this does not go straight to the simulation
     }
 
     //preparing an event handler to be used by the program
