@@ -5,14 +5,25 @@ use std::{
 
 use sfml::{graphics::FloatRect, system::Vector2};
 
-use crate::transmission::{GuiToGraphicsEvent, GuiToSimEvent, InputEvent};
+use crate::{
+    transmission::{GuiToGraphicsEvent, GuiToSimEvent, InputEvent},
+    widgets::PlaceholderWidget,
+};
 
+const NUMBER_OF_WIDGETS: usize = 0;
 #[allow(unused)]
-pub fn gui_thread(handler: GuiHandler) {}
+pub fn gui_thread(
+    graphics_sender: Sender<GuiToGraphicsEvent>,
+    sim_sender: Sender<GuiToSimEvent>,
+    input_reciever: Receiver<InputEvent>,
+) {
+    let mut handler = GuiHandler::from_senders(graphics_sender, sim_sender, input_reciever);
+    handler.start_recv();
+}
 
 //The struct that handles inputs for the GUI thread
-pub struct GuiHandler {
-    items: Vec<Box<dyn GuiWidget>>,
+pub struct GuiHandler<const T: usize> {
+    items: [Box<dyn GuiWidget>; T], //using a const generic because this should never have to change in length but I don't know how many widgets I want to necesarily put in
     graphics_sender: Sender<GuiToGraphicsEvent>,
     sim_sender: Sender<GuiToSimEvent>,
     input_receiver: Receiver<InputEvent>,
@@ -23,7 +34,7 @@ pub struct GuiHandler {
     highlighted_size: f32,
 }
 
-trait GuiWidget: Debug {
+pub trait GuiWidget: Debug {
     //The function that will be called when the screen is clicked.
     //will return ClickRegistered if the click happens on this widget
     fn check_clicked(&self, spot: Vector2<i32>) -> ClickResponse;
@@ -54,23 +65,25 @@ trait GuiWidget: Debug {
     );
 }
 
-enum ClickResponse {
+#[allow(unused)]
+pub enum ClickResponse {
     ClickRegistered,
     ClickNotUsed,
 }
 
-impl GuiHandler {
+impl<const T: usize> GuiHandler<T> {
     //the reason that I use the blocking recieve here is because the gui never does anything on it's own. it's only for handling user input
-    pub fn recv(&mut self) {
-        if let Ok(event) = self.input_receiver.recv() {
+    pub fn start_recv(mut self) {
+        while let Ok(event) = self.input_receiver.recv() {
             self.handle_events(event);
         }
     }
 
+    //at some point, I'm going to do all of the processing on this thread, I just haven't gotten around to it
     pub fn handle_events(&mut self, event: InputEvent) {
         match event {
-            InputEvent::LeftClick { screen_pos, pos } => todo!(),
-            InputEvent::ShutDown => todo!(),
+            InputEvent::LeftClick { screen_pos, pos } => self.left_click((screen_pos, pos)),
+            InputEvent::ShutDown => self.send_shut_down(),
             InputEvent::Clear => todo!(),
         }
     }
@@ -96,5 +109,33 @@ impl GuiHandler {
                 pos: details.1,
             })
             .expect("Could not send to the Simulation thread!");
+    }
+
+    //sends the shutdown events to the other threads
+    fn send_shut_down(&mut self) {
+        self.graphics_sender
+            .send(GuiToGraphicsEvent::ShutDown)
+            .unwrap();
+        self.sim_sender.send(GuiToSimEvent::Exit).unwrap();
+    }
+}
+
+impl GuiHandler<NUMBER_OF_WIDGETS> {
+    pub fn from_senders(
+        graphics_sender: Sender<GuiToGraphicsEvent>,
+        sim_sender: Sender<GuiToSimEvent>,
+        input_receiver: Receiver<InputEvent>,
+    ) -> GuiHandler<NUMBER_OF_WIDGETS> {
+        let temp = [Box::new(PlaceholderWidget) as Box<dyn GuiWidget>; 0];
+        GuiHandler {
+            items: temp,
+            graphics_sender,
+            sim_sender,
+            input_receiver,
+            clicked_widget_idx: None,
+            highlighted_colour: (255, 255, 255),
+            highlighted_mass: 20.0,
+            highlighted_size: 25.0,
+        }
     }
 }

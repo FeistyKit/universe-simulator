@@ -14,3 +14,7 @@
 - saving and loading from files
 
 - think of something to with delta timing
+
+- put processing of inputs to gui thread
+
+- decide whether or not to keep the "clickregistered" enum

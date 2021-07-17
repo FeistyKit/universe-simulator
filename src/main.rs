@@ -1,4 +1,5 @@
 mod eventhandling;
+
 #[path = "./rendering/graphicbody.rs"]
 mod graphicbody;
 #[path = "./rendering/graphichandler.rs"]
@@ -10,6 +11,8 @@ mod simulation_thread;
 #[path = "./simulation/spacebody.rs"]
 mod spacebody;
 mod transmission;
+#[path = "./gui/widgets.rs"]
+mod widgets;
 #[path = "./simulation/worldspace.rs"]
 mod worldspace;
 use std::{sync::mpsc::channel, thread};

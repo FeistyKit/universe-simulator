@@ -62,4 +62,6 @@ pub enum GuiToSimEvent {
 
 //An event to be sent from the gui thread to the graphics thread.
 #[derive(Debug)]
-pub enum GuiToGraphicsEvent {}
+pub enum GuiToGraphicsEvent {
+    ShutDown,
+}
