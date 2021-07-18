@@ -30,12 +30,8 @@ pub fn simulation_thread_start(
     //preparations for my terrible delta time function
     let mut time = Instant::now();
     'simulation: loop {
-        //so I can't publish a release of the code without the GUI thread implemented
-        if !cfg!(debug_assertions) {
-            panic!("gui threading!");
-        }
         while let Ok(event) = receiver.try_recv() {
-            //handle events received from the main function
+            //handle events received from the gui thread
             if handle_received_events(event, &mut space, &mut sender) {
                 break 'simulation;
             }

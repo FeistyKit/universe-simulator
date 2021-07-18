@@ -19,6 +19,7 @@ pub fn gui_thread(
 ) {
     let mut handler = GuiHandler::from_senders(graphics_sender, sim_sender, input_reciever);
     handler.start_recv();
+    println!("Gui thread has exited!");
 }
 
 //The struct that handles inputs for the GUI thread
@@ -84,7 +85,7 @@ impl<const T: usize> GuiHandler<T> {
         match event {
             InputEvent::LeftClick { screen_pos, pos } => self.left_click((screen_pos, pos)),
             InputEvent::ShutDown => self.send_shut_down(),
-            InputEvent::Clear => todo!(),
+            InputEvent::Clear => self.sim_sender.send(GuiToSimEvent::Clear).unwrap(),
         }
     }
 

@@ -49,11 +49,13 @@ impl<'bodies> GraphicHandler<'bodies> {
                 debug_assert_eq!(self.bodies[idx].shape.position(), pos); //the same, but only debug assert because I think it's fairly costly to do
                 self.bodies[idx].shape.move_(change);
             }
+
             //deleting a body
             SimulationEvent::Delete { id, idx } => {
                 assert_eq!(self.bodies[idx].id, id); //the id system is quite handy I think
                 self.bodies.remove(idx);
             }
+
             //adding a body
             SimulationEvent::Add {
                 id,
@@ -70,6 +72,7 @@ impl<'bodies> GraphicHandler<'bodies> {
                 //actually adding the body to the list of bodies
                 self.bodies.push(body);
             }
+
             //clearing the list of bodies
             SimulationEvent::Clear => self.bodies = Vec::new(),
         }
