@@ -23,7 +23,7 @@ use sfml::{
 };
 
 use crate::{
-    eventhandling::EventHandler, graphichandler::GraphicHandler,
+    eventhandling::EventHandler, graphichandler::GraphicHandler, gui::gui_thread,
     simulation_thread::simulation_thread_start,
 };
 
@@ -40,15 +40,12 @@ fn main() {
     //create the sender and reciever for communication with the simulation thread
     let (simulation_sender, simulation_receiver) = channel();
 
-    //prepare the graphics handler to handle the graphics on the main thread.
-    //My goal is to have as few operations that are not directly graphics related as possible running on this thread
-    let mut graphics_handler = GraphicHandler::new(simulation_receiver);
-
     //preparing the event handler. it will take events from sfml and send whatever is needed to the graphics thread or GUI thread
-    let (mut handler, input_reciever) = EventHandler::prepare();
+    let (mut handler, main_to_gui_reciever) = EventHandler::prepare();
 
-    //preparing the channel between the GUI thread and the simulation thread
-    let (_, gui_to_sim_receiver) = channel();
+    //preparing the channels between the GUI thread and the simulation thread
+    let (gui_to_sim_sender, gui_to_sim_receiver) = channel();
+    let (gui_to_main_sender, gui_to_main_reciever) = channel();
 
     //Making the simulation thread
     let simulation_thread = thread::Builder::new()
@@ -56,6 +53,16 @@ fn main() {
         .spawn(|| simulation_thread_start(simulation_sender, gui_to_sim_receiver))
         .unwrap(); //If making the simulation thread fails the whole program should end;
                    //it is a necesary part of the program.
+
+    //making the GUI thread
+    let gui_thread = thread::Builder::new()
+        .name("GUI".to_string())
+        .spawn(|| gui_thread(gui_to_main_sender, gui_to_sim_sender, main_to_gui_reciever))
+        .unwrap();
+
+    //prepare the graphics handler to handle the graphics on the main thread.
+    //My goal is to have as few operations that are not directly graphics related as possible running on this thread
+    let mut graphics_handler = GraphicHandler::new(simulation_receiver, gui_to_main_reciever);
 
     //the main loop of the graphics side of the program
     while window.is_open() {
@@ -76,4 +83,5 @@ fn main() {
         window.display();
     }
     simulation_thread.join().unwrap();
+    gui_thread.join().unwrap();
 }

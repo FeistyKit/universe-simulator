@@ -10,8 +10,8 @@ use crate::transmission::InputEvent;
 
 //the event handling struct for the main thread. It'll find what needs to be sent where and send it to be used later
 pub struct EventHandler {
-    pub trans_to_simulation: Sender<InputEvent>, //I definitely didn't name them this way just to say "trans" nope nope nope >.>
-    pub trans_to_gui: Sender<InputEvent>,
+    pub trans_to_gui: Sender<InputEvent>, //I definitely didn't name them this way just to say "trans" nope nope nope >.>
+                                          //I removed the sender to the simulation because all of it will be routed through the GUI thread
 }
 
 impl EventHandler {
@@ -20,7 +20,7 @@ impl EventHandler {
         match event {
             Event::Closed => {
                 //make sure the simulation thread shuts down with the rest of the program
-                self.trans_to_simulation.send(InputEvent::ShutDown).unwrap();
+                self.trans_to_gui.send(InputEvent::ShutDown).unwrap();
                 window.close();
             }
             Event::MouseButtonPressed { button, x, y } => {
@@ -60,18 +60,14 @@ impl EventHandler {
     pub fn prepare() -> (EventHandler, Receiver<InputEvent>) {
         //prepares to start the program and the other threads
 
-        //prepare transmittors to the simulation thread
-        let (simul_tx, simul_receiver) = channel(); //simul_receiver is the reciever that is to be sent to the simulation thread
-
-        //this is not being used as of right now, but it is necesary to create the struct
-        let (gui_tx, _) = channel();
+        //creating the channel to the other threads
+        let (gui_tx, gui_rx) = channel();
 
         let handler = EventHandler {
-            trans_to_simulation: simul_tx,
             trans_to_gui: gui_tx,
         };
 
-        (handler, simul_receiver)
+        (handler, gui_rx)
     }
 
     fn handle_key_pressed(
@@ -92,7 +88,7 @@ impl EventHandler {
                 window.set_view(&view);
             }
             Key::C => {
-                self.trans_to_simulation.send(InputEvent::Clear).unwrap();
+                self.trans_to_gui.send(InputEvent::Clear).unwrap();
             }
             _ => {}
         }

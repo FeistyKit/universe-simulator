@@ -1,26 +1,36 @@
 use std::sync::mpsc::Receiver;
 
-use crate::{graphicbody::GraphicBody, transmission::SimulationEvent};
+use crate::{
+    graphicbody::GraphicBody,
+    transmission::{GuiToGraphicsEvent, SimulationEvent},
+};
 
 use sfml::graphics::{CircleShape, Color, RenderTarget, Shape, Transformable};
 
+#[allow(unused)]
 //the graphics handler struct
 pub struct GraphicHandler<'bodies> {
     bodies: Vec<GraphicBody<'bodies>>,
-    receiver: Receiver<SimulationEvent>,
+    sim_receiver: Receiver<SimulationEvent>,
+    gui_reciever: Receiver<GuiToGraphicsEvent>, //recievers from the other threads
 }
+
 impl<'bodies> GraphicHandler<'bodies> {
     //a new graphics handler
-    pub fn new(receiver: Receiver<SimulationEvent>) -> GraphicHandler<'bodies> {
+    pub fn new(
+        sim_receiver: Receiver<SimulationEvent>,
+        gui_reciever: Receiver<GuiToGraphicsEvent>,
+    ) -> GraphicHandler<'bodies> {
         GraphicHandler {
             bodies: Vec::new(),
-            receiver,
+            sim_receiver,
+            gui_reciever,
         }
     }
 
     //the function to update the graphics handler.
     pub fn update(&mut self) {
-        while let Ok(input) = self.receiver.try_recv() {
+        while let Ok(input) = self.sim_receiver.try_recv() {
             self.handle_input(input);
         }
     }
@@ -64,6 +74,8 @@ impl<'bodies> GraphicHandler<'bodies> {
             SimulationEvent::Clear => self.bodies = Vec::new(),
         }
     }
+
+    //drawing the stuff to the window
     pub fn draw(&self, target: &mut dyn RenderTarget) {
         for body in &self.bodies {
             target.draw(&body.shape);
