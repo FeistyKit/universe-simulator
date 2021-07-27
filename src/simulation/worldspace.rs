@@ -1,13 +1,20 @@
 #![allow(clippy::explicit_counter_loop)]
-use std::sync::{mpsc::Sender, Arc, Mutex};
+use std::{
+    fs,
+    io::Write,
+    sync::{mpsc::Sender, Arc, Mutex},
+};
 
 use sfml::system::Vector2f;
 
 use crate::{spacebody::*, transmission::SimulationEvent};
 
+use serde::{Deserialize, Serialize};
+
 use rayon::prelude::*;
 
 #[allow(unused)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct WorldSpace {
     bodies: Vec<SpaceBody>,
     highlighted_id: Option<usize>, //the id of the spacebody that is being "followed" by the camera
@@ -133,5 +140,20 @@ impl WorldSpace {
             })
             .unwrap();
         self.bodies.push(body);
+    }
+
+    //serialize the worldspace in a file
+    pub fn to_file(&self, name: String) -> Result<(), Box<dyn std::error::Error>> {
+        let string = serde_json::to_string(&self)?;
+        let mut file = fs::File::create(name)?;
+        file.write_all(string.as_bytes())?;
+        Ok(())
+    }
+
+    //deserialising the worldspace from the file
+    pub fn from_file(name: String) -> Result<WorldSpace, Box<dyn std::error::Error>> {
+        let unser = fs::read_to_string(name)?;
+        let space = serde_json::from_str(&unser)?;
+        Ok(space)
     }
 }
