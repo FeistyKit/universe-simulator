@@ -15,7 +15,7 @@ const NUMBER_OF_WIDGETS: usize = 0;
 pub fn gui_thread(
     graphics_sender: Sender<GuiToGraphicsEvent>,
     sim_sender: Sender<GuiToSimEvent>,
-    input_reciever: Receiver<InputEvent>,
+   input_reciever: Receiver<InputEvent>,
 ) {
     let mut handler = GuiHandler::from_senders(graphics_sender, sim_sender, input_reciever);
     handler.start_recv();

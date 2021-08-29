@@ -66,8 +66,10 @@ fn main() {
 
     //the main loop of the graphics side of the program
     while window.is_open() {
+
         //using up all of the events in between the previous cycles
         while let Some(event) = window.poll_event() {
+
             //from here, the handler can take the event and do whatever is necesary with it
             handler.handle_events(event, &mut window);
         }
