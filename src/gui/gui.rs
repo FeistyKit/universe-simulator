@@ -7,10 +7,8 @@ use sfml::{graphics::FloatRect, system::Vector2};
 
 use crate::{
     transmission::{GuiToGraphicsEvent, GuiToSimEvent, InputEvent},
-    widgets::PlaceholderWidget,
 };
 
-const NUMBER_OF_WIDGETS: usize = 0;
 #[allow(unused)]
 pub fn gui_thread(
     graphics_sender: Sender<GuiToGraphicsEvent>,
@@ -23,8 +21,8 @@ pub fn gui_thread(
 }
 
 //The struct that handles inputs for the GUI thread
-pub struct GuiHandler<const T: usize> {
-    items: [Box<dyn GuiWidget>; T], //using a const generic because this should never have to change in length but I don't know how many widgets I want to necesarily put in
+pub struct GuiHandler {
+    items: Vec<Box<dyn GuiWidget>>, //using a const generic because this should never have to change in length but I don't know how many widgets I want to necesarily put in
     graphics_sender: Sender<GuiToGraphicsEvent>,
     sim_sender: Sender<GuiToSimEvent>,
     input_receiver: Receiver<InputEvent>,
@@ -72,7 +70,7 @@ pub enum ClickResponse {
     ClickNotUsed,
 }
 
-impl<const T: usize> GuiHandler<T> {
+impl GuiHandler {
     //the reason that I use the blocking recieve here is because the gui never does anything on it's own. it's only for handling user input
     pub fn start_recv(mut self) {
         while let Ok(event) = self.input_receiver.recv() {
@@ -119,15 +117,14 @@ impl<const T: usize> GuiHandler<T> {
             .unwrap();
         self.sim_sender.send(GuiToSimEvent::Exit).unwrap();
     }
-}
 
-impl GuiHandler<NUMBER_OF_WIDGETS> {
+    //create a GuiHandler by passing in the senders to it. I may change these values later.
     pub fn from_senders(
         graphics_sender: Sender<GuiToGraphicsEvent>,
         sim_sender: Sender<GuiToSimEvent>,
         input_receiver: Receiver<InputEvent>,
-    ) -> GuiHandler<NUMBER_OF_WIDGETS> {
-        let temp = [Box::new(PlaceholderWidget) as Box<dyn GuiWidget>; 0];
+    ) -> GuiHandler {
+        let temp = Vec::new();
         GuiHandler {
             items: temp,
             graphics_sender,
@@ -140,3 +137,4 @@ impl GuiHandler<NUMBER_OF_WIDGETS> {
         }
     }
 }
+
