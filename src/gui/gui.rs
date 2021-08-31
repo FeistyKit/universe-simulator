@@ -5,15 +5,13 @@ use std::{
 
 use sfml::{graphics::FloatRect, system::Vector2};
 
-use crate::{
-    transmission::{GuiToGraphicsEvent, GuiToSimEvent, InputEvent},
-};
+use crate::transmission::{GuiToGraphicsEvent, GuiToSimEvent, InputEvent};
 
 #[allow(unused)]
 pub fn gui_thread(
     graphics_sender: Sender<GuiToGraphicsEvent>,
     sim_sender: Sender<GuiToSimEvent>,
-   input_reciever: Receiver<InputEvent>,
+    input_reciever: Receiver<InputEvent>,
 ) {
     let mut handler = GuiHandler::from_senders(graphics_sender, sim_sender, input_reciever);
     handler.start_recv();
@@ -32,6 +30,7 @@ pub struct GuiHandler {
     highlighted_mass: f32,
     highlighted_size: f32,
 }
+
 
 pub trait GuiWidget: Debug {
     //The function that will be called when the screen is clicked.
@@ -137,4 +136,3 @@ impl GuiHandler {
         }
     }
 }
-

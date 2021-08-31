@@ -7,4 +7,3 @@ use crate::{
     gui::{ClickResponse, GuiWidget},
     transmission::{GuiToGraphicsEvent, GuiToSimEvent},
 };
-
