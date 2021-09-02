@@ -1,3 +1,6 @@
+
+
+
 use std::sync::mpsc::{channel, Receiver, Sender};
 
 use sfml::{
@@ -53,7 +56,6 @@ impl EventHandler {
                 pos,
             })
             .unwrap(); //send coordinates to gui thread for processing
-                       //TODO Put in gui things so that this does not go straight to the simulation
     }
 
     //preparing an event handler to be used by the program

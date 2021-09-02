@@ -82,6 +82,8 @@ fn main() {
         graphics_handler.draw(&mut window);
         window.display();
     }
+
+    //ending the program
     simulation_thread.join().unwrap();
     gui_thread.join().unwrap();
 }

@@ -31,12 +31,16 @@ impl<'bodies> GraphicHandler<'bodies> {
     //the function to update the graphics handler.
     pub fn update(&mut self) {
         while let Ok(input) = self.sim_receiver.try_recv() {
-            self.handle_input(input);
+            self.handle_sim_input(input);
+        }
+
+        while let Ok(input) = self.gui_reciever.try_recv() {
+            self.handle_gui_input(input);
         }
     }
 
     //handle info from the simulation thread
-    fn handle_input(&mut self, input: SimulationEvent) {
+    fn handle_sim_input(&mut self, input: SimulationEvent) {
         match input {
             //moving a body
             SimulationEvent::Move {
@@ -75,6 +79,13 @@ impl<'bodies> GraphicHandler<'bodies> {
 
             //clearing the list of bodies
             SimulationEvent::Clear => self.bodies = Vec::new(),
+        }
+    }
+
+    //Handle input from the Gui thread
+    fn handle_gui_input(&mut self, input: GuiToGraphicsEvent) {
+        match input {
+            GuiToGraphicsEvent::ShutDown => {} //nothing to actually do on shutdown
         }
     }
 

@@ -76,7 +76,6 @@ fn handle_received_events(
         }
         GuiToSimEvent::Exit => return true,
         GuiToSimEvent::Clear => {
-            println!("clearing space!");
             space.clear(sender);
         }
     }

@@ -15,12 +15,11 @@ pub fn gui_thread(
 ) {
     let mut handler = GuiHandler::from_senders(graphics_sender, sim_sender, input_reciever);
     handler.start_recv();
-    println!("Gui thread has exited!");
 }
 
 //The struct that handles inputs for the GUI thread
 pub struct GuiHandler {
-    items: Vec<Box<dyn GuiWidget>>, //using a const generic because this should never have to change in length but I don't know how many widgets I want to necesarily put in
+    items: Vec<Box<dyn GuiWidget>>, //Widgets will be added to the list as different states change.
     graphics_sender: Sender<GuiToGraphicsEvent>,
     sim_sender: Sender<GuiToSimEvent>,
     input_receiver: Receiver<InputEvent>,
@@ -73,21 +72,28 @@ impl GuiHandler {
     //the reason that I use the blocking recieve here is because the gui never does anything on it's own. it's only for handling user input
     pub fn start_recv(mut self) {
         while let Ok(event) = self.input_receiver.recv() {
-            self.handle_events(event);
+            if self.handle_events(event) {
+                break;
+            }
         }
     }
 
     //at some point, I'm going to do all of the processing on this thread, I just haven't gotten around to it
-    pub fn handle_events(&mut self, event: InputEvent) {
+    pub fn handle_events(&mut self, event: InputEvent) -> bool {
         match event {
             InputEvent::LeftClick { screen_pos, pos } => self.left_click((screen_pos, pos)),
-            InputEvent::ShutDown => self.send_shut_down(),
+            InputEvent::ShutDown => {
+                self.send_shut_down();
+                return true;
+            },
             InputEvent::Clear => self.sim_sender.send(GuiToSimEvent::Clear).unwrap(),
         }
+        false
     }
 
     //handle left click
     fn left_click(&mut self, details: (Vector2<i32>, Vector2<f32>)) {
+
         //checking through the vec to see if any widgets are being clicked.
         //if any are, don't put a body onto the space.
         for idx in 0..self.items.len() {
