@@ -15,7 +15,7 @@
 
 - think of something to with delta timing
 
-- put processing of inputs to gui thread
+- ~~put processing of inputs to gui thread~~ Decided against.
 
 - decide whether or not to keep the "clickregistered" enum
 
