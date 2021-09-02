@@ -30,7 +30,6 @@ pub struct GuiHandler {
     highlighted_size: f32,
 }
 
-
 pub trait GuiWidget: Debug {
     //The function that will be called when the screen is clicked.
     //will return ClickRegistered if the click happens on this widget
@@ -85,7 +84,7 @@ impl GuiHandler {
             InputEvent::ShutDown => {
                 self.send_shut_down();
                 return true;
-            },
+            }
             InputEvent::Clear => self.sim_sender.send(GuiToSimEvent::Clear).unwrap(),
         }
         false
@@ -93,7 +92,6 @@ impl GuiHandler {
 
     //handle left click
     fn left_click(&mut self, details: (Vector2<i32>, Vector2<f32>)) {
-
         //checking through the vec to see if any widgets are being clicked.
         //if any are, don't put a body onto the space.
         for idx in 0..self.items.len() {

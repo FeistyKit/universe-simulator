@@ -1,6 +1,3 @@
-
-
-
 use std::sync::mpsc::{channel, Receiver, Sender};
 
 use sfml::{
