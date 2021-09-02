@@ -57,7 +57,6 @@ impl EventHandler {
 
     //preparing an event handler to be used by the program
     pub fn prepare() -> (EventHandler, Receiver<InputEvent>) {
-        //prepares to start the program and the other threads
 
         //creating the channel to the other threads
         let (gui_tx, gui_rx) = channel();

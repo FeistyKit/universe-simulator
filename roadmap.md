@@ -7,7 +7,14 @@
 
 - potentially do some refactoring in regards to my imported type conventions
 
-- GUI thread
+- ~~GUI thread~~ Got the *thread* running, just have to do the GUI itself :p
+
+- The GUI Itself
+  - Widgets
+
+  - Requires two clicks to place down bodies so motion can be implemented.
+
+  - Click and drag(?)
 
 - fix softening and gravity constants
 

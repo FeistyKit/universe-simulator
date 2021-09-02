@@ -71,6 +71,8 @@ impl GuiHandler {
     //the reason that I use the blocking recieve here is because the gui never does anything on it's own. it's only for handling user input
     pub fn start_recv(mut self) {
         while let Ok(event) = self.input_receiver.recv() {
+
+            //Break the loop if the shutdown event is triggered.
             if self.handle_events(event) {
                 break;
             }
@@ -92,7 +94,7 @@ impl GuiHandler {
 
     //handle left click
     fn left_click(&mut self, details: (Vector2<i32>, Vector2<f32>)) {
-        //checking through the vec to see if any widgets are being clicked.
+        //checking through the vector to see if any widgets are being clicked.
         //if any are, don't put a body onto the space.
         for idx in 0..self.items.len() {
             if let ClickResponse::ClickRegistered = self.items[idx].check_clicked(details.0) {
@@ -127,9 +129,8 @@ impl GuiHandler {
         sim_sender: Sender<GuiToSimEvent>,
         input_receiver: Receiver<InputEvent>,
     ) -> GuiHandler {
-        let temp = Vec::new();
         GuiHandler {
-            items: temp,
+            items: Vec::new(),
             graphics_sender,
             sim_sender,
             input_receiver,
