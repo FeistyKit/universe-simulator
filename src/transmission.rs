@@ -1,3 +1,4 @@
+#![allow(unused)]
 use sfml::system::{Vector2, Vector2f};
 
 //events that can be sent to the main thread for graphics processing
@@ -55,6 +56,7 @@ pub enum GuiToSimEvent {
         size: f32,
         mass: f32,
         pos: Vector2<f32>,
+        vel: (f32, f32), //the velocity that the body has
     },
     Clear,
     Exit,
@@ -65,8 +67,8 @@ pub enum GuiToSimEvent {
 pub enum GuiToGraphicsEvent {
     ShutDown,
     EnableGuideline {
-        positions: [(f32, f32); 10],
+        position: (f32, f32),
         colour: (u8, u8, u8),
     },
-    DisableGuideline
+    DisableGuideline,
 }

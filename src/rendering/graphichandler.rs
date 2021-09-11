@@ -90,10 +90,10 @@ impl<'bodies> GraphicHandler<'bodies> {
     //Handle input from the Gui thread
     fn handle_gui_input(&mut self, input: GuiToGraphicsEvent) {
         match input {
-            GuiToGraphicsEvent::ShutDown => {}, //nothing to actually do on shutdown
-            GuiToGraphicsEvent::EnableGuideline { positions, colour } => {
+            GuiToGraphicsEvent::ShutDown => {} //nothing to actually do on shutdown
+            GuiToGraphicsEvent::EnableGuideline { position, colour } => {
                 todo!();
-            },
+            }
             GuiToGraphicsEvent::DisableGuideline => {
                 todo!();
             }

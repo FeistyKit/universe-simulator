@@ -29,6 +29,7 @@ use crate::{
 
 fn main() {
     //prepare the window to be used and set the frame limit for it
+
     let mut window = RenderWindow::new(
         (1000, 1000),
         "Universe Sim",

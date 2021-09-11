@@ -60,6 +60,7 @@ fn handle_received_events(
             size,
             mass,
             pos,
+            vel,
         } => {
             //adding the body to the worldspace. the "add_body" method will handle sending it to the main thread
             let body = SpaceBody::new(
@@ -68,8 +69,8 @@ fn handle_received_events(
                 mass,
                 size,
                 Some((color.0, color.1, color.2)),
-                0.0,
-                0.0,
+                vel.0,
+                vel.1,
                 None,
             );
             space.add_body(body, sender);
