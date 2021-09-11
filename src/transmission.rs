@@ -64,4 +64,9 @@ pub enum GuiToSimEvent {
 #[derive(Debug)]
 pub enum GuiToGraphicsEvent {
     ShutDown,
+    EnableGuideline {
+        positions: [(f32, f32); 10],
+        colour: (u8, u8, u8),
+    },
+    DisableGuideline
 }

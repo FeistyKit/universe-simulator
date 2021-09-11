@@ -7,10 +7,14 @@ use crate::{
 
 use sfml::graphics::{CircleShape, Color, RenderTarget, Shape, Transformable};
 
+//The number of spots for the guidelines to use
+const GUIDELINE_SPOT_NUMBER: usize = 10;
+
 #[allow(unused)]
 //the graphics handler struct
 pub struct GraphicHandler<'bodies> {
     bodies: Vec<GraphicBody<'bodies>>,
+    guideline_spots: Option<[CircleShape<'bodies>; GUIDELINE_SPOT_NUMBER]>, //The spots that make up the guideline. When the guideline is not shown, this will be None
     sim_receiver: Receiver<SimulationEvent>,
     gui_reciever: Receiver<GuiToGraphicsEvent>, //recievers from the other threads
 }
@@ -23,6 +27,7 @@ impl<'bodies> GraphicHandler<'bodies> {
     ) -> GraphicHandler<'bodies> {
         GraphicHandler {
             bodies: Vec::new(),
+            guideline_spots: None,
             sim_receiver,
             gui_reciever,
         }
@@ -85,7 +90,13 @@ impl<'bodies> GraphicHandler<'bodies> {
     //Handle input from the Gui thread
     fn handle_gui_input(&mut self, input: GuiToGraphicsEvent) {
         match input {
-            GuiToGraphicsEvent::ShutDown => {} //nothing to actually do on shutdown
+            GuiToGraphicsEvent::ShutDown => {}, //nothing to actually do on shutdown
+            GuiToGraphicsEvent::EnableGuideline { positions, colour } => {
+                todo!();
+            },
+            GuiToGraphicsEvent::DisableGuideline => {
+                todo!();
+            }
         }
     }
 

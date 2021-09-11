@@ -25,6 +25,10 @@ pub struct GuiHandler {
     input_receiver: Receiver<InputEvent>,
     clicked_widget_idx: Option<usize>, //the index of the widget that has been clicked, for performance reasons
     //if no widget has been clicked, it is None
+    clicked_pos: Option<(usize, usize, f32, f32)>, //Keeps the original position clicked on the screen, 
+                                                   //as well as the original position clicked in the worldspace.
+                                                   //It's so that you can click twice to use
+                                                   //velocity on the body that will be added.
     highlighted_colour: (u8, u8, u8), //the values to be put if a body is added to the simulation
     highlighted_mass: f32,
     highlighted_size: f32,
@@ -138,6 +142,7 @@ impl GuiHandler {
             highlighted_colour: (255, 255, 255),
             highlighted_mass: 20.0,
             highlighted_size: 25.0,
+            clicked_pos: None,
         }
     }
 }
